@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Pivotal.Helper;
 
 namespace DotNetCoreWorkshop_MVC
 {
@@ -37,8 +38,22 @@ namespace DotNetCoreWorkshop_MVC
 
             services.AddMvc();
 
+            // Use the Bound Service for connection string if it is found in a User Provided Service
+            string dbString = Configuration.GetConnectionString("AttendeeContext");
+            CFEnvironmentVariables _env = new CFEnvironmentVariables();
+            var _connect = _env.getConnectionStringForDbService("user-provided", "AttendeeContext");
+            if (!string.IsNullOrEmpty(_connect))
+            {
+                Console.WriteLine($"Using bound service connection string for data: {_connect}");
+                dbString = _connect;
+            }
+            else
+            {
+                Console.WriteLine($"Using connection string from appsetings.json");
+            }
+
             services.AddDbContext<AttendeeContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("AttendeeContext")));
+                    options.UseSqlServer(dbString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

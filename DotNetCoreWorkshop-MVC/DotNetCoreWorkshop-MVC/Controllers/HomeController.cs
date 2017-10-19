@@ -53,6 +53,13 @@ namespace DotNetCoreWorkshop_MVC.Controllers
             return View();
         }
 
+        public ActionResult KillMe()
+        {
+            Environment.Exit(-1);
+
+            return View();
+        }
+
         [Authorize]
 
         public IActionResult Secured()
